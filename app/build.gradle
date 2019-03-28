@@ -26,8 +26,8 @@ dependencies {
     })
     implementation 'com.android.support:appcompat-v7:25.4.0'
     testImplementation 'junit:junit:4.12'
-
     /*PictureSelector*/
     implementation 'com.github.LuckSiege.PictureSelector:picture_library:v2.1.0'
     implementation 'com.android.support:recyclerview-v7:25.4.0'
+    implementation files('libs/commons-net-3.3.jar')
 }

@@ -4,21 +4,29 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.luck.picture.lib.PictureSelector;
 import com.luck.picture.lib.config.PictureConfig;
 import com.luck.picture.lib.config.PictureMimeType;
 import com.luck.picture.lib.entity.LocalMedia;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +38,15 @@ public class Selector extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private PopupWindow pop;    //Pop-up window
 
+    Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg){
+            super.handleMessage(msg);
+            Bundle data = msg.getData();
+            String val = data.getString("Value");
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,12 +55,17 @@ public class Selector extends AppCompatActivity {
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler);
 
 
+
         Button btn_upload = (Button) this.findViewById(R.id.btn_upload);
         btn_upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent=new Intent(Selector.this,Upload.class);
                 startActivity(intent);
+                new Thread(runnable).start();
+                //Log.d("path：",selectList.get(0).getPath());
+                //Log.d("path2:",selectList.get(2).getPath());
+                //uploadFtp(file);
             }
         });
 
@@ -95,6 +117,8 @@ public class Selector extends AppCompatActivity {
             }
         });
     }
+
+
 
     /**
      * The function of clicking "add" picture
@@ -194,4 +218,26 @@ public class Selector extends AppCompatActivity {
             }
         }
     }
+
+    Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            //File file =new File(selectList.get(1).getPath());
+            File file = new File("/storage/emulated/0/DCIM/Camera/IMG_20190322_184718.jpg");
+            try{
+                FileInputStream in = new FileInputStream(file);
+                boolean flag = FileTool.uploadFile("192.168.214.1",21,"312980341@qq.com","cyd19980819","/","test.jpg",in);
+                Log.d("flag:",String.valueOf(flag));
+            }catch(FileNotFoundException e){
+                e.printStackTrace();
+            }
+
+
+            Message msg = Message.obtain();
+            Bundle data = new Bundle();
+            data.putString("value","存放数据");
+            msg.setData(data);
+            handler.sendMessage(msg);
+        }
+    };
 }

@@ -9,51 +9,47 @@ import org.apache.commons.net.ftp.FTPReply;
 
 public class FileTool {
     /**
-     * Description: 向FTP服务器上传文件
+     * Description: Upload file to FTP server
      *
      * @param url
-     *            FTP服务器hostname
+     *            FTP server hostname
      * @param port
-     *            FTP服务器端口
+     *            FTP server port
      * @param username
-     *            FTP登录账号
+     *            FTP username for login
      * @param password
-     *            FTP登录密码
+     *            FTP password for login
      * @param path
-     *            FTP服务器保存目录，是linux下的目录形式,如/photo/
+     *            The directories for FTP server saves, which are in the form of directories under Linux, such as/photo/
      * @param filename
-     *            上传到FTP服务器上的文件名,是自己定义的名字，
+     *            The file name uploaded defined by yourself to the FTP server.
      * @param input
-     *            输入流
-     * @return 成功返回true，否则返回false
+     *            Input stream
+     * @return If success, return true,otherwise return false.
      */
     public static boolean uploadFile(String url, int port, String username,
                                      String password, String path, String filename, InputStream input) {
         boolean success = false;
         FTPClient ftp = new FTPClient();
-        // LogUitl.Infor(url+port+username+password+path);
-
-
         try {
             int reply;
-            ftp.connect(url, port);// 连接FTP服务器
-            // 如果采用默认端口，可以使用ftp.connect(url)的方式直接连接FTP服务器
-            ftp.login(username, password);//登录
+            ftp.connect(url, port);// connect
+            ftp.login(username, password);//login
             reply = ftp.getReplyCode();
             if (!FTPReply.isPositiveCompletion(reply)) {
                 ftp.disconnect();
                 return success;
             }
-            ftp.setFileType(FTP.BINARY_FILE_TYPE);//上传上去的图片数据格式（）一定要写这玩意，不然在服务器就打不开了
-            if (!ftp.changeWorkingDirectory(path)) {
+            ftp.setFileType(FTP.BINARY_FILE_TYPE);//Upload the picture data format, or you won't be open on the server.
+            if (!ftp.changeWorkingDirectory(path)) { //Create a new directory based on Path
                 if (ftp.makeDirectory(path)) {
                     ftp.changeWorkingDirectory(path);
                 }
             }
-            //  ftp.changeWorkingDirectory(path);
-            //设置成其他端口的时候要添加这句话
-            //  ftp.enterLocalPassiveMode();
-            ftp.storeFile(filename, input);
+            ftp.enterLocalPassiveMode();
+            if(!ftp.storeFile(filename, input)){
+                return success;
+            }
             input.close();
             ftp.logout();
             success = true;

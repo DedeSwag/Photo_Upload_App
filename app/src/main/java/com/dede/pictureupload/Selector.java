@@ -63,7 +63,7 @@ public class Selector extends AppCompatActivity {
                 Intent intent=new Intent(Selector.this,Upload.class);
                 startActivity(intent);
                 new Thread(runnable).start();
-                //Log.d("path：",selectList.get(0).getPath());
+                Log.d("path：",selectList.get(0).getPath());
                 //Log.d("path2:",selectList.get(2).getPath());
                 //uploadFtp(file);
             }
@@ -219,15 +219,19 @@ public class Selector extends AppCompatActivity {
         }
     }
 
+    /**
+     * The function of uploading by FTP
+     * */
     Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            //File file =new File(selectList.get(1).getPath());
-            File file = new File("/storage/emulated/0/DCIM/Camera/IMG_20190322_184718.jpg");
             try{
-                FileInputStream in = new FileInputStream(file);
-                boolean flag = FileTool.uploadFile("192.168.214.1",21,"312980341@qq.com","cyd19980819","/","test.jpg",in);
-                Log.d("flag:",String.valueOf(flag));
+                for(int i=0;i<selectList.size();i++){
+                    File file = new File(selectList.get(i).getPath());
+                    FileInputStream in = new FileInputStream(file);
+                    boolean flag = FileTool.uploadFile("192.168.214.1",21,"312980341@qq.com","cyd19980819","/imag/","demo"+i+".jpg",in);
+                    Log.d("flag:",String.valueOf(flag));
+                }
             }catch(FileNotFoundException e){
                 e.printStackTrace();
             }
@@ -235,7 +239,7 @@ public class Selector extends AppCompatActivity {
 
             Message msg = Message.obtain();
             Bundle data = new Bundle();
-            data.putString("value","存放数据");
+            data.putString("value","data");
             msg.setData(data);
             handler.sendMessage(msg);
         }
